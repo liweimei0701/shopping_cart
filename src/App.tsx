@@ -30,20 +30,36 @@ const App = () => {
     getProducts
   );
 
+  const getCart = () => {
+    const response = fetch(
+      "https://blue-dew-7661.us-east1.akkaserverless.app/carts/c_03",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then(res => console.log(res.json())
+    );
+  };
   const handleAddToCart = (clickItem: CartItemType): void => {
-    // const isAlreadyIn = cartItems.find(item => item.id === clickItem.id)
-    // console.log(isAlreadyIn);
-
-    // let newCartItems:CartItemType[] = [];
-    // if(isAlreadyIn) {
-    //   newCartItems = cartItems.map(item =>
-    //     item.id === clickItem.id
-    //     ? {...item, amount: item.amount + 1}
-    //      : item
-    //   )
-    // }
-    // newCartItems = [...cartItems, {...clickItem, amount: 1}];
-    // setCartItems(newCartItems);
+    const payload = {
+      product_id: clickItem.id,
+      name: clickItem.title,
+      quantity: 1,
+    };
+    const response = fetch(
+      "https://blue-dew-7661.us-east1.akkaserverless.app/cart/c_03/items/add",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    ).then((res) => {
+      console.log(res, payload);
+    });
     setCartItems((prev) => {
       const isItemInCart = prev.find((item) => item.id === clickItem.id);
 
@@ -59,6 +75,15 @@ const App = () => {
     cartItems.reduce((ack: number, item) => ack + item.amount, 0);
 
   const handleRemoveFromCart = (id: number): void => {
+    const response = fetch(
+      `https://blue-dew-7661.us-east1.akkaserverless.app/cart/c_03/items/${id}/remove`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => console.log(`item ${id} has been removed successfully`));
     setCartItems((prev) => {
       return prev
         .map((item) => {
@@ -81,7 +106,7 @@ const App = () => {
           removeFromCart={handleRemoveFromCart}
         />
       </Drawer>
-      <StyledButton onClick={() => setOpen(true)}>
+      <StyledButton onClick={() => {getCart();setOpen(true)}}>
         <Badge badgeContent={getTotalItems(cartItems)} color="error">
           <AddShoppingCartIcon />
         </Badge>
